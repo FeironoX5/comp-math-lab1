@@ -1,0 +1,78 @@
+.matrix-title {
+  font-family: "Hahmlet", serif;
+  font-weight: 900;
+  font-size: 30px;
+  margin: 0;
+}
+
+.number-input-wrapper {
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  border-bottom: 1px dotted black;
+}
+
+.number-input-wrapper input {
+  font: inherit;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: center;
+  padding: 0 5px;
+}
+
+.arrow-buttons {
+  display: inline-flex;
+  flex-direction: column;
+  margin-left: 2px;
+}
+
+.arrow-buttons button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  width: 20px;
+  height: 12px;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.arrow-up::before {
+  content: "▲";
+  color: #000;
+  display: block;
+}
+
+.arrow-down::before {
+  content: "▼";
+  color: #000;
+  display: block;
+}
+
+h1 {
+  font-size: 30px;
+  font-family: "Hahmlet", serif;
+}
+
+h2 {
+  font-size: 18px;
+  font-family: "Hahmlet", serif;
+}
+
+.hor-table td {
+  width: auto;
+  padding: 0 5px;
+}
+
+.result-item {
+  width: 100%;
+  overflow: scroll;
+}
+
+.error-message {
+  padding: 10px;
+  background: #e88585;
+  color: #5c2c2c;
+  border-radius: 8px;
+}

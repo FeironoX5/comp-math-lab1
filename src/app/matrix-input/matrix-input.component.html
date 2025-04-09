@@ -1,0 +1,17 @@
+<table class="matrix-table">
+  <tbody>
+    @for (row of matrix(); let i = $index; track i; ) {
+      <tr @rowAnimation>
+        @for (cell of row; let j = $index; track j) {
+          <td @cellAnimation>
+            <input type="number"
+                   [ngModel]="cell"
+                   (ngModelChange)="updateCell(i, j, $event)">
+          </td>
+        }
+      </tr>
+    }
+  </tbody>
+</table>
+
+
