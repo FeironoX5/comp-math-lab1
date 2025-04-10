@@ -1,99 +1,91 @@
-<div
-  style="height: 60px; background: #000; position: fixed; top: 0; left: 0; right: 0; text-align: center; color: white; line-height: 60px;">
+<header class="app-header">
+  <button mat-icon-button><mat-icon (click)="drawer.toggle()" style="color: white">menu</mat-icon></button>
+  <div class="spacer"></div>
   Fixed-point iteration method
-</div>
-<div
-  style="position: fixed; background: #ffffff; top: 60px; left: 0; bottom: 0; width: 30vw; padding: 30px 40px; overflow-y: scroll; border-right: 2px solid black">
-  <p class="matrix-title">
-    Compute the solution for the matrix having a size of
-    <span class="number-input-wrapper">
-      <input type="number" [(ngModel)]="size" (ngModelChange)="setSize($event)" min="1" max="20" step="1">
+  <div class="spacer"></div>
+</header>
+<mat-drawer-container style="margin-top: var(--header-height); height: calc(100% - var(--header-height));" autosize>
+  <mat-drawer #drawer mode="side" opened>
+    <div class="drawer-content">
+      <p class="matrix-title">
+        Compute the solution for the matrix having a size of
+        <span class="number-input-wrapper">
+      <input type="number" [(ngModel)]="size" (change)="setSize()" min="1" max="20" step="1">
       <span class="arrow-buttons">
         <button (click)="setSize(size + 1)" class="arrow-up" type="button"></button>
         <button (click)="setSize(size - 1)" class="arrow-down" type="button"></button>
       </span>
     </span>
-    with
-    <span class="number-input-wrapper">
-        <input style="width: 180px" type="number" [(ngModel)]="accuracy" (change)="compute()" min="1" max="20" step="1">
-      </span>
-    accuracy
-  </p>
-  <div style="width: 100%; margin-top: 15px;">
-    <app-matrix-input [size]="size" (matrixChange)="compute()"></app-matrix-input>
-  </div>
-  <div style="display: flex; gap: 5px; margin-top: 20px;">
-    <input placeholder="Min random value" [(ngModel)]="minMatrixValue">
-    <input placeholder="Max random value" [(ngModel)]="maxMatrixValue">
-  </div>
-  <button (click)="randomize()"
-          style="margin-top: 5px; width: 100%;">
-    Randomize
-  </button>
-  <div style="display: flex; gap: 5px; margin-top: 15px; align-items: center">
-    <hr>
-    or
-    <hr>
-  </div>
-  <label
-    matTooltip="The first line of the file should contain the matrix size n and accuracy, followed by n rows of n matrix elements separated by commas"
-    for="fileInput" class="file-input-button" style="margin-top: 15px;">
-    Choose File
-  </label>
-  <input
-    type="file"
-    id="fileInput"
-    (change)="onFileSelected($event)"
-    style="display: none;">
-</div>
-<div style="padding: calc(60px + 20px) 20px 30px calc(30vw + 40px*2 + 20px);">@if (progress > 0) {
-  <div class="progress-container">
-    <div class="progress-text">Calculating... ({{ progress }} iterations)</div>
-    <div class="progress-bar">
-      <div class="progress-bar-fill" [style.width.%]="progress / 1000 * 100"></div>
-    </div>
-  </div>
-}
+        with
+        <span class="number-input-wrapper">
+      <input style="width: 180px" type="number" [(ngModel)]="accuracy" (change)="compute()" min="1" max="20" step="1">
+    </span>
+        accuracy
+      </p>
 
-  @if (error) {
-    <div class="error-message">
-      Error: {{ error }}
-    </div>
-  }
-
-  @if (result) {
-    <div class="results">
-      <h1>Results</h1>
-
-      <div class="result-item">
-        <h2>Solution Vector</h2>
-        <table class="hor-table">
-          <tr>
-            @for (value of result.solution; track $index) {
-              <td>
-                x{{ $index + 1 }}
-              </td>
-            }
-          </tr>
-          <tr>
-            @for (value of result.solution; track $index) {
-              <td>
-                {{ value.toFixed(6) }}
-              </td>
-            }
-          </tr>
-        </table>
+      <div class="result-item" style="margin-top: var(--spacing-sm)">
+        <app-matrix-input [size]="size" (matrixChange)="compute()"></app-matrix-input>
       </div>
 
-      <div class="result-item">
-        <h2>Convergence Information</h2>
-        <div class="convergence-info">
-          <div>Iterations: {{ result.iterations }}</div>
-          <div>Norm: {{ result.norm.toFixed(6) }}</div>
-          <div>Precision Vector:</div>
-          <table class="hor-table">
+      <div class="input-group">
+        <input class="input-field" placeholder="Min random value" [(ngModel)]="minMatrixValue">
+        <input class="input-field" placeholder="Max random value" [(ngModel)]="maxMatrixValue">
+      </div>
+
+      <button style="margin-top: var(--spacing-sm)" class="btn" (click)="randomize()">
+        Randomize
+      </button>
+
+      <div class="divider">
+        <hr>
+        or
+        <hr>
+      </div>
+
+      <label
+        matTooltip="The first line of the file should contain the matrix size n and accuracy, followed by n rows of n matrix elements separated by commas"
+        for="fileInput"
+        class="file-input-button">
+        Choose File
+      </label>
+
+      <input
+        type="file"
+        id="fileInput"
+        (change)="onFileSelected($event)"
+        style="display: none;">
+    </div>
+
+
+  </mat-drawer>
+
+  <main class="app-content">
+    @if (progress > 0) {
+      <div class="loader-container">
+        <mat-spinner mode="determinate" [value]="progress/MAX_ITERATIONS * 100"></mat-spinner>
+      </div>
+    } @else if (error) {
+      <div class="error-message">
+        Error: {{ error }}
+      </div>
+    } @else if (result) {
+      <div class="results">
+        <h1>Results</h1>
+
+        <div class="result-item">
+          <h2>Solution Vector</h2>
+          <table class="hor-table table">
+            <thead>
             <tr>
-              @for (value of result.precisionVector; track $index) {
+              @for (value of result.solution; track $index) {
+                <th>
+                  x{{ $index + 1 }}
+                </th>
+              }
+            </tr>
+            </thead>
+            <tr>
+              @for (value of result.solution; track $index) {
                 <td>
                   {{ value.toFixed(6) }}
                 </td>
@@ -101,35 +93,54 @@
             </tr>
           </table>
         </div>
-      </div>
 
-      @if (result.steps.length > 0) {
         <div class="result-item">
-          <h2>Iteration Steps</h2>
-          <div class="steps-container">
-            <table class="steps-table">
-              <thead>
+          <h2>Convergence Information</h2>
+          <div class="convergence-info">
+            <div>Iterations: {{ result.iterations }}</div>
+            <div>Norm: {{ result.norm.toFixed(6) }}</div>
+            <div>Precision Vector:</div>
+            <table class="hor-table table">
               <tr>
-                <th>Iteration</th>
-                @for (val of result.solution; track $index) {
-                  <th>x{{ $index + 1 }}</th>
+                @for (value of result.precisionVector; track $index) {
+                  <td>
+                    {{ value.toFixed(6) }}
+                  </td>
                 }
               </tr>
-              </thead>
-              <tbody>
-                @for (step of result.steps; track $index) {
-                  <tr>
-                    <td>{{ $index + 1 }}</td>
-                    @for (value of step; track $index) {
-                      <td>{{ value.toFixed(6) }}</td>
-                    }
-                  </tr>
-                }
-              </tbody>
             </table>
           </div>
         </div>
-      }
-    </div>
-  }
-</div>
+
+        @if (result.steps.length > 0) {
+          <div class="result-item">
+            <h2>Iteration Steps</h2>
+            <div class="steps-container">
+              <table class="steps-table table">
+                <thead>
+                <tr>
+                  <th>Iteration</th>
+                  @for (val of result.solution; track $index) {
+                    <th>x{{ $index + 1 }}</th>
+                  }
+                </tr>
+                </thead>
+                <tbody>
+                  @for (step of result.steps; track $index) {
+                    <tr>
+                      <td>{{ $index + 1 }}</td>
+                      @for (value of step; track $index) {
+                        <td>{{ value.toFixed(6) }}</td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </main>
+</mat-drawer-container>
+

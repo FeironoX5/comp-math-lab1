@@ -1,17 +1,18 @@
-<table class="matrix-table">
+<table class="matrix-table table">
   <tbody>
-    @for (row of matrix(); let i = $index; track i; ) {
+    @for (row of matrix(); let i = $index; track i) {
       <tr @rowAnimation>
         @for (cell of row; let j = $index; track j) {
-          <td @cellAnimation>
-            <input type="number"
-                   [ngModel]="cell"
-                   (ngModelChange)="updateCell(i, j, $event)">
+          <td @cellAnimation
+              contenteditable="true"
+              [textContent]="cell"
+              (input)="handleCellInput(i, j, $event)">
+            <!--            <input type="number"-->
+            <!--                   [ngModel]="cell"-->
+            <!--                   (ngModelChange)="updateCell(i, j, $event)">-->
           </td>
         }
       </tr>
     }
   </tbody>
 </table>
-
-

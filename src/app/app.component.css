@@ -1,7 +1,41 @@
+.app-header {
+  height: var(--header-height);
+  background: var(--color-primary);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--color-text-light);
+  line-height: var(--header-height);
+  z-index: 10;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  padding: 0 20px;
+}
+
+mat-drawer {
+  background: var(--color-background);
+  outline: 2px solid var(--color-primary);
+}
+
+.drawer-content {
+  padding: var(--spacing-xl) var(--spacing-xxl);
+}
+
+.app-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
 .matrix-title {
-  font-family: "Hahmlet", serif;
+  font-family: var(--font-heading);
   font-weight: 900;
-  font-size: 30px;
+  font-size: var(--font-size-h1);
   margin: 0;
 }
 
@@ -9,7 +43,7 @@
   font: inherit;
   display: inline-flex;
   align-items: center;
-  border-bottom: 1px dotted black;
+  border-bottom: 1px dotted var(--color-primary);
 }
 
 .number-input-wrapper input {
@@ -18,7 +52,7 @@
   outline: none;
   background: transparent;
   text-align: center;
-  padding: 0 5px;
+  padding: 0 var(--spacing-xs);
 }
 
 .arrow-buttons {
@@ -40,39 +74,62 @@
 
 .arrow-up::before {
   content: "▲";
-  color: #000;
+  color: var(--color-primary);
   display: block;
 }
 
 .arrow-down::before {
   content: "▼";
-  color: #000;
+  color: var(--color-primary);
   display: block;
 }
 
-h1 {
-  font-size: 30px;
-  font-family: "Hahmlet", serif;
+.input-group {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-md);
 }
 
-h2 {
-  font-size: 18px;
-  font-family: "Hahmlet", serif;
+.divider {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin: var(--spacing-sm) 0;
+  align-items: center;
 }
 
 .hor-table td {
   width: auto;
-  padding: 0 5px;
+  padding: 0 var(--spacing-xs);
+}
+
+.results {
+  width: 100%;
 }
 
 .result-item {
   width: 100%;
-  overflow: scroll;
+  overflow: auto;
+  margin-bottom: var(--spacing-lg);
 }
 
 .error-message {
-  padding: 10px;
-  background: #e88585;
-  color: #5c2c2c;
-  border-radius: 8px;
+  padding: var(--spacing-sm);
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
+  border-radius: var(--border-radius);
+}
+
+.loader-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.convergence-info div {
+  margin-bottom: var(--spacing-xs);
+}
+
+.mat-drawer {
+  color: var(--color-text);
 }

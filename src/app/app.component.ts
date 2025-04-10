@@ -1,8 +1,12 @@
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatrixInputComponent} from './matrix-input/matrix-input.component';
 import {FormsModule} from '@angular/forms';
-import {IterationResult} from './iteration.worker';
+import {IterationResult, MAX_ITERATIONS} from './iteration.worker';
 import {MatTooltip} from '@angular/material/tooltip';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
+import {MatIconButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
 
 export interface ParsedMatrixData {
   n: number;
@@ -12,7 +16,7 @@ export interface ParsedMatrixData {
 
 @Component({
   selector: 'app-root',
-  imports: [MatrixInputComponent, FormsModule, MatTooltip],
+  imports: [MatrixInputComponent, FormsModule, MatTooltip, MatProgressSpinner, MatDrawerContainer, MatDrawer, MatIconButton, MatIcon],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -92,10 +96,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  setSize(newSize: number) {
+  setSize(newSize: number = this.size) {
     this.size = Math.min(Math.max(1, newSize), 20);
     this.cdr.detectChanges();
-    this.matrixInput.fillMatrix();
   }
 
   public randomize() {
@@ -195,4 +198,6 @@ export class AppComponent implements OnInit, OnDestroy {
         });
     }
   }
+
+  protected readonly MAX_ITERATIONS = MAX_ITERATIONS;
 }

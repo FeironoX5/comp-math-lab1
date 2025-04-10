@@ -1,4 +1,14 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, Output, signal} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  effect,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  signal,
+  SimpleChanges
+} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {trigger, style, animate, transition} from '@angular/animations';
 import {MatTooltip} from '@angular/material/tooltip';
@@ -30,13 +40,19 @@ import {MatTooltip} from '@angular/material/tooltip';
     ])
   ]
 })
-export class MatrixInputComponent {
+export class MatrixInputComponent implements OnChanges {
   @Input() size = 2;
   protected matrix = signal<number[][]>([]);
   @Output() matrixChange = new EventEmitter();
 
   constructor() {
-    setTimeout(() => this.updateMatrix([[0, 0, 0], [0, 0, 0]]))
+    effect(() => {
+      this.matrixChange.emit(this.matrix());
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['size']) this.fillMatrix();
   }
 
   public updateMatrix(newMatrix: number[][]) {
@@ -56,15 +72,23 @@ export class MatrixInputComponent {
     this.updateMatrix(newMatrix);
   }
 
+  handleCellInput(rowIndex: number, colIndex: number, event: Event): void {
+    const element = event.target as HTMLTableCellElement;
+    const value = element.textContent || '';
+    if (!/^-?\d*\.?\d*$/.test(value) && value !== '') {
+      element.textContent = String(this.matrix()[rowIndex][colIndex]);
+      return;
+    }
+    this.updateCell(rowIndex, colIndex, value === '' ? 0 : parseFloat(value));
+  }
+
   updateCell(rowIndex: number, colIndex: number, value: number) {
     const newMatrix = this.matrix().map(row => [...row]);
     newMatrix[rowIndex][colIndex] = value;
     this.updateMatrix(newMatrix);
   }
 
-
   public getMatrix() {
     return this.matrix();
   }
-
 }

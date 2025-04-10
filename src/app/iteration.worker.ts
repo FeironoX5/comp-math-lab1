@@ -8,7 +8,7 @@ export interface IterationResult {
   norm: number;
 }
 
-const MAX_ITERATIONS = 1000000;
+export const MAX_ITERATIONS = 1000000;
 
 addEventListener('message',
   ({data}: {
