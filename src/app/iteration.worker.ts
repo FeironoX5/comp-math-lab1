@@ -35,7 +35,7 @@ addEventListener('message',
 function compute(matrix: number[][], precision: number): IterationResult {
   // STEP 1. PARSE MATRIX & VALIDATE ARGS
   const n = matrix.length; // number of rows
-  const a: number[][] = []; // left side coefficients
+  let a: number[][] = []; // left side coefficients
   const b: number[] = []; // right side coefficients
   matrix.forEach(row => {
     a.push(row.slice(0, n));
@@ -43,7 +43,11 @@ function compute(matrix: number[][], precision: number): IterationResult {
   });
   if (n < 2) throw new Error('The matrix must be at least two rows');
   if (precision <= 0) throw new Error('Precision must be a positive number');
-  if (!isDiagonallyDominant(a)) throw new Error('The matrix is not diagonally dominant');
+  if (calculateNorm(a) >= 1) {
+    const {matrix: modifiedA, success} = tryMakeDiagonallyDominant(a);
+    if (!success) throw new Error('The matrix is not diagonally dominant');
+    else a = modifiedA;
+  }
 
   // STEP 2. GENERAL VARS
   const norm = calculateNorm(a);
@@ -90,17 +94,56 @@ function compute(matrix: number[][], precision: number): IterationResult {
   };
 }
 
-function isDiagonallyDominant(A: number[][]): boolean {
-  return A.every((row, i) => {
-    const diag = Math.abs(row[i]);
-    let sum = 0;
-    for (let j = 0; j < row.length; j++) {
-      if (j !== i) {
-        sum += Math.abs(row[j]);
+function tryMakeDiagonallyDominant(A: number[][]): { matrix: number[][], success: boolean } {
+  const n = A.length;
+  const matrix = A.map(row => [...row]);
+  for (let i = 0; i < n; i++) {
+    if (Math.abs(matrix[i][i]) <= getRowSumWithoutDiagonal(matrix[i], i)) {
+      let found = false;
+      for (let j = i + 1; j < n; j++) {
+        if (Math.abs(matrix[j][i]) > getRowSumWithoutDiagonal(matrix[j], i)) {
+          [matrix[i], matrix[j]] = [matrix[j], matrix[i]];
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        for (let j = i + 1; j < n; j++) {
+          if (Math.abs(matrix[i][j]) > getColSumWithoutDiagonal(matrix, i, j)) {
+            for (let k = 0; k < n; k++) {
+              [matrix[k][i], matrix[k][j]] = [matrix[k][j], matrix[k][i]];
+            }
+            found = true;
+            break;
+          }
+        }
+      }
+      if (!found) {
+        return {matrix: A, success: false};
       }
     }
-    return diag >= sum;
-  });
+  }
+  return {matrix, success: calculateNorm(matrix) < 1};
+}
+
+function getRowSumWithoutDiagonal(row: number[], index: number): number {
+  let sum = 0;
+  for (let i = 0; i < row.length; i++) {
+    if (i !== index) {
+      sum += Math.abs(row[i]);
+    }
+  }
+  return sum;
+}
+
+function getColSumWithoutDiagonal(matrix: number[][], colIndex: number, excludeRow: number): number {
+  let sum = 0;
+  for (let i = 0; i < matrix.length; i++) {
+    if (i !== excludeRow) {
+      sum += Math.abs(matrix[i][colIndex]);
+    }
+  }
+  return sum;
 }
 
 function calculateNorm(A: number[][]): number {
@@ -108,19 +151,16 @@ function calculateNorm(A: number[][]): number {
   let maxSum = 0;
   for (let i = 0; i < n; i++) {
     const diagElement = A[i][i];
-    let sum = 0;
-    for (let j = 0; j < n; j++) {
-      if (i !== j) {
-        sum += Math.abs(A[i][j] / diagElement);
-      }
-    }
-    maxSum = Math.max(maxSum, sum);
+    let rowSum = 0;
+    A[i].forEach((val, j) =>
+      i != j && (rowSum += Math.abs(val / diagElement))
+    );
+    maxSum = Math.max(maxSum, rowSum);
   }
   return maxSum;
 }
 
 function generateRandomMatrix(size: number, min: number = -10, max: number = 10): number[][] {
-  console.log(min, max);
   const range = max - min;
   const matrix: number[][] = [];
   for (let i = 0; i < size; i++) {
@@ -128,15 +168,19 @@ function generateRandomMatrix(size: number, min: number = -10, max: number = 10)
     let sum = 0;
     for (let j = 0; j < size; j++) {
       if (i !== j) {
-        const value = min + Math.random() * range;
+        let value = min + Math.random() * range;
+        value = Math.round(value * 1000) / 1000;
         row.push(value);
         sum += Math.abs(value);
       } else {
         row.push(0); // placeholder for diagonal element
       }
     }
-    row[i] = sum * (1 + Math.random()); // set diagonal element
-    row.push(min + Math.random() * range * 2); // random value for right side coefficient
+    row[i] = sum * (1 + Math.random() / 2); // set diagonal element
+    row[i] = Math.round(row[i] * 1000) / 1000;
+    let rightSideK = min + Math.random() * range * 2;
+    rightSideK = Math.round(rightSideK * 1000) / 1000;
+    row.push(rightSideK); // random value for right side coefficient
     matrix.push(row);
   }
   return matrix;

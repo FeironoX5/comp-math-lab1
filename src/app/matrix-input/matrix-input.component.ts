@@ -43,12 +43,8 @@ import {MatTooltip} from '@angular/material/tooltip';
 export class MatrixInputComponent implements OnChanges {
   @Input() size = 2;
   protected matrix = signal<number[][]>([]);
-  @Output() matrixChange = new EventEmitter();
 
   constructor() {
-    effect(() => {
-      this.matrixChange.emit(this.matrix());
-    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -57,7 +53,6 @@ export class MatrixInputComponent implements OnChanges {
 
   public updateMatrix(newMatrix: number[][]) {
     this.matrix.set(newMatrix);
-    this.matrixChange.emit();
   }
 
   public fillMatrix() {

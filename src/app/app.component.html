@@ -1,16 +1,26 @@
 <header class="app-header">
-  <button mat-icon-button><mat-icon (click)="drawer.toggle()" style="color: white">menu</mat-icon></button>
+  <button mat-icon-button>
+    <mat-icon (click)="drawer.toggle()" style="color: white">menu</mat-icon>
+  </button>
   <div class="spacer"></div>
   Fixed-point iteration method
   <div class="spacer"></div>
+  <button class="btn" (click)="progress > 0 ? stopCalculation() : compute()"
+          style="
+          width: auto;
+          background: transparent;
+          border: #cccccc 1px solid;
+">
+    {{ progress > 0 ? 'Stop calculation' : 'Compute' }}
+  </button>
 </header>
 <mat-drawer-container style="margin-top: var(--header-height); height: calc(100% - var(--header-height));" autosize>
   <mat-drawer #drawer mode="side" opened>
     <div class="drawer-content">
       <p class="matrix-title">
-        Compute the solution for the matrix having a size of
+        Solution for the matrix having a size of
         <span class="number-input-wrapper">
-      <input type="number" [(ngModel)]="size" (change)="setSize()" min="1" max="20" step="1">
+      <input #sizeInput type="number" value="2" (input)="setSize()" min="1" max="20" step="1">
       <span class="arrow-buttons">
         <button (click)="setSize(size + 1)" class="arrow-up" type="button"></button>
         <button (click)="setSize(size - 1)" class="arrow-down" type="button"></button>
@@ -18,13 +28,13 @@
     </span>
         with
         <span class="number-input-wrapper">
-      <input style="width: 180px" type="number" [(ngModel)]="accuracy" (change)="compute()" min="1" max="20" step="1">
+      <input style="width: 180px" type="number" [(ngModel)]="accuracy" min="1" max="20" step="1">
     </span>
         accuracy
       </p>
 
       <div class="result-item" style="margin-top: var(--spacing-sm)">
-        <app-matrix-input [size]="size" (matrixChange)="compute()"></app-matrix-input>
+        <app-matrix-input [size]="size"></app-matrix-input>
       </div>
 
       <div class="input-group">
@@ -32,7 +42,8 @@
         <input class="input-field" placeholder="Max random value" [(ngModel)]="maxMatrixValue">
       </div>
 
-      <button style="margin-top: var(--spacing-sm)" class="btn" (click)="randomize()">
+      <button style="margin-top: var(--spacing-sm)" class="btn"
+              (click)="randomize()">
         Randomize
       </button>
 
@@ -55,11 +66,9 @@
         (change)="onFileSelected($event)"
         style="display: none;">
     </div>
-
-
   </mat-drawer>
 
-  <main class="app-content">
+  <main class="app-content" style="min-width: 50vw">
     @if (progress > 0) {
       <div class="loader-container">
         <mat-spinner mode="determinate" [value]="progress/MAX_ITERATIONS * 100"></mat-spinner>
@@ -112,7 +121,7 @@
           </div>
         </div>
 
-        @if (result.steps.length > 0) {
+        @if (result && result.steps.length > 0) {
           <div class="result-item">
             <h2>Iteration Steps</h2>
             <div class="steps-container">

@@ -22,8 +22,10 @@ export interface ParsedMatrixData {
 })
 export class AppComponent implements OnInit, OnDestroy {
   @ViewChild(MatrixInputComponent) matrixInput!: MatrixInputComponent;
+  @ViewChild('sizeInput') sizeInput?: { nativeElement: { value: any; }; };
 
   size: number = 2;
+  sizeChanger: any;
   accuracy: number = 0.0001;
   minMatrixValue: number = -10000;
   maxMatrixValue: number = 10000;
@@ -86,6 +88,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   compute() {
+    this.cdr.detectChanges();
     const matrix = this.matrixInput.getMatrix();
     this.error = undefined;
     this.progress = 0;
@@ -96,9 +99,13 @@ export class AppComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  setSize(newSize: number = this.size) {
-    this.size = Math.min(Math.max(1, newSize), 20);
-    this.cdr.detectChanges();
+  setSize(newSize: number = Number(this.sizeInput!.nativeElement.value)) {
+    if (this.sizeChanger) clearTimeout(this.sizeChanger);
+    this.sizeChanger = setTimeout(() => {
+      this.size = Math.min(Math.max(1, newSize), 20);
+      this.sizeInput!.nativeElement.value = this.size;
+      this.cdr.detectChanges();
+    }, 500);
   }
 
   public randomize() {
@@ -160,7 +167,7 @@ export class AppComponent implements OnInit, OnDestroy {
             const rowLine = lines[i + 1].trim();
             const rowParts = rowLine.split(',').map(val => val.trim());
             if (rowParts.length !== n + 1) {
-              throw new Error(`It was expected ${n + 1} elements in row #${i + 2}`);
+              throw new Error(`It was expected ${n + 1} elements in row #${i + 2}: ${rowParts.join(',')}`);
             }
             const row = rowParts.map(val => {
               const num = parseFloat(val);
@@ -173,7 +180,8 @@ export class AppComponent implements OnInit, OnDestroy {
           }
           resolve({n, accuracy, matrix});
         } catch (error: any) {
-          this.error = error.message;
+          reject(new Error(error.message));
+          return;
         }
       };
       reader.readAsText(file);
@@ -186,7 +194,7 @@ export class AppComponent implements OnInit, OnDestroy {
       const file = input.files[0];
       this.parseMatrixFile(file)
         .then(parsedData => {
-          this.size = parsedData.n;
+          this.setSize(parsedData.n);
           this.accuracy = parsedData.accuracy;
           this.matrixInput.updateMatrix(parsedData.matrix);
           this.error = undefined;

@@ -80,7 +80,7 @@ input {
   display: block;
   background: var(--color-primary);
   border: none;
-  padding: var(--spacing-sm) var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius);
   color: var(--color-text-light);
   cursor: pointer;
